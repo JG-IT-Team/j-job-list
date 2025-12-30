@@ -3,7 +3,7 @@ module.exports = {
     name: 'j-job-list',
     script: 'npm',
     args: 'start',
-    cwd: '/mnt/hddraid/projects/j-job-list',
+    cwd: '/opt/www/j-job-list',
     instances: 1, // Or more for clustering, e.g., 'max' for CPU cores
     exec_mode: 'fork', // Use 'cluster' for multiple instances
     env: {
