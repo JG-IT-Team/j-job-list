@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { useParams, notFound } from 'next/navigation'
 import { supabase, type Job, type Event } from '@/lib/supabase'
 import Header from '@/components/Header'
 import JobSearch from '@/components/JobSearch'
@@ -8,7 +9,23 @@ import JobCard from '@/components/JobCard'
 import EventsSection from '@/components/EventsSection'
 import FloatingButtons from '@/components/FloatingButtons'
 
-export default function Home() {
+const countryMapping: Record<string, string> = {
+  ph: 'Philippines',
+  in: 'India',
+  np: 'Nepal',
+  ma: 'Morocco',
+  tn: 'Tunisia',
+}
+
+export default function CountryPage() {
+  const params = useParams()
+  const countryCode = params.countryCode as string
+  const countrySource = countryMapping[countryCode.toLowerCase()]
+
+  if (!countrySource) {
+    notFound()
+  }
+
   const [jobs, setJobs] = useState<Job[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,9 +39,20 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true)
         const [jobsRes, eventsRes] = await Promise.all([
-          supabase.from('jobs').select('*').eq('status', 'Open').order('id', { ascending: false }),
-          supabase.from('events').select('*').eq('status', 'Open').order('created_at', { ascending: false }),
+          supabase
+            .from('jobs')
+            .select('*')
+            .eq('job_source', countrySource)
+            .eq('status', 'Open')
+            .order('id', { ascending: false }),
+          supabase
+            .from('events')
+            .select('*')
+            .eq('job_source', countrySource)
+            .eq('status', 'Open')
+            .order('created_at', { ascending: false }),
         ])
 
         if (jobsRes.data) setJobs(jobsRes.data)
@@ -37,7 +65,7 @@ export default function Home() {
     }
 
     fetchData()
-  }, [])
+  }, [countrySource])
 
   // Get unique countries and categories for filters
   const countries = useMemo(() => {
@@ -95,7 +123,7 @@ export default function Home() {
       <section className="px-4 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-base font-medium text-gray-900">Latest Jobs</h2>
+            <h2 className="text-xs text-gray-900">Latest Jobs for {countrySource} Applicants</h2>
             <span className="text-xs text-gray-500">{filteredJobs.length} jobs found</span>
           </div>
 
@@ -103,7 +131,7 @@ export default function Home() {
             <div className="text-center py-8 text-gray-500">Loading jobs...</div>
           ) : filteredJobs.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No jobs found. Try adjusting your search or filters.
+              No jobs found for {countrySource}.
             </div>
           ) : (
             <div className="space-y-3">

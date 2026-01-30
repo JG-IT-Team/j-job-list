@@ -17,6 +17,7 @@ export interface Job {
   image_link: string | null
   status: string | null
   job_description: string | null
+  job_source: string | null
 }
 
 export interface Event {
@@ -27,4 +28,5 @@ export interface Event {
   industry: string | null
   description: string | null
   status: string | null
+  job_source: string | null
 }
