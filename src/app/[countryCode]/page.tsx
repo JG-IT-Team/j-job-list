@@ -67,19 +67,26 @@ export default function CountryPage() {
     fetchData()
   }, [countrySource])
 
-  // Get unique countries and categories for filters
+  // Get unique countries and categories (industries) for filters
   const countries = useMemo(() => {
-    const unique = [...new Set(jobs.map((j) => j.country).filter(Boolean))] as string[]
+    const jobCountries = jobs.map((j) => j.job_location)
+    const eventCountries = events.map((e) => e.job_location)
+    const unique = [...new Set([...jobCountries, ...eventCountries].filter(Boolean))] as string[]
     return unique.sort()
-  }, [jobs])
+  }, [jobs, events])
 
   const categories = useMemo(() => {
-    const sourceJobs = selectedCountry
-      ? jobs.filter((j) => j.country === selectedCountry)
-      : jobs
-    const unique = [...new Set(sourceJobs.map((j) => j.category).filter(Boolean))] as string[]
+    const jobCategories = selectedCountry
+      ? jobs.filter((j) => j.job_location === selectedCountry).map((j) => j.industry)
+      : jobs.map((j) => j.industry)
+    
+    const eventIndustries = selectedCountry
+      ? events.filter((e) => e.job_location === selectedCountry).map((e) => e.industry)
+      : events.map((e) => e.industry)
+
+    const unique = [...new Set([...jobCategories, ...eventIndustries].filter(Boolean))] as string[]
     return unique.sort()
-  }, [jobs, selectedCountry])
+  }, [jobs, events, selectedCountry])
 
   const handleCountryChange = (country: string) => {
     setSelectedCountry(country)
@@ -91,11 +98,23 @@ export default function CountryPage() {
     return jobs.filter((job) => {
       const matchesSearch =
         !searchTerm || job.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCountry = !selectedCountry || job.country === selectedCountry
-      const matchesCategory = !selectedCategory || job.category === selectedCategory
+      const matchesCountry = !selectedCountry || job.job_location === selectedCountry
+      const matchesCategory = !selectedCategory || job.industry === selectedCategory
       return matchesSearch && matchesCountry && matchesCategory
     })
   }, [jobs, searchTerm, selectedCountry, selectedCategory])
+
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      const matchesSearch =
+        !searchTerm || 
+        event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCountry = !selectedCountry || event.job_location === selectedCountry
+      const matchesCategory = !selectedCategory || event.industry === selectedCategory
+      return matchesSearch && matchesCountry && matchesCategory
+    })
+  }, [events, searchTerm, selectedCountry, selectedCategory])
 
   const handleReset = () => {
     setSearchTerm('')
@@ -144,7 +163,7 @@ export default function CountryPage() {
       </section>
 
       {/* Events section */}
-      <EventsSection events={events} />
+      <EventsSection events={filteredEvents} />
 
       {/* Floating action buttons */}
       <FloatingButtons />

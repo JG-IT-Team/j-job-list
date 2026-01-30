@@ -31,16 +31,16 @@ export default function JobCard({ job }: JobCardProps) {
 
       {/* Info row */}
       <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
-        {job.country && (
+        {job.job_location && (
           <span className="flex items-center gap-1">
             <MapPin className="w-3 h-3" />
-            {job.country}
+            {job.job_location}
           </span>
         )}
-        {job.category && (
+        {job.industry && (
           <span className="flex items-center gap-1">
             <Briefcase className="w-3 h-3" />
-            {job.category}
+            {job.industry}
           </span>
         )}
         {job.email && (

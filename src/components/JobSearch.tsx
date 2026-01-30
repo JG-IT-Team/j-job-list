@@ -94,7 +94,7 @@ export default function JobSearch({
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="flex-1 py-2 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary"
             >
-              <option value="">All Categories</option>
+              <option value="">All Industries</option>
               {categories.map((category) => (
                 <option key={category} value={category}>
                   {category}

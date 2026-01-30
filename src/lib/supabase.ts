@@ -9,8 +9,8 @@ export interface Job {
   id: number
   job_group_id: string
   job_post_id: string
-  country: string | null
-  category: string | null
+  job_location: string | null
+  industry: string | null
   job_title: string | null
   email: string | null
   apply_link: string | null
